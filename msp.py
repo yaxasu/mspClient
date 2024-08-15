@@ -1,6 +1,8 @@
-"""
-A Python implementation to interact with the MSP API
-"""
+#-----------------------------------------------------------------------------------------
+# 
+# A python implementation of interacting with msps API with websockets
+#
+#-----------------------------------------------------------------------------------------
 
 import hashlib
 import binascii
@@ -13,14 +15,20 @@ from urllib.parse import urlparse
 from pyamf import remoting, ASObject, TypedObject, AMF3, amf3
 from secrets import token_hex
 
+#-----------------------------------------------------------------------------------------
 # Generator to retrieve a Marking ID for ticket headers
+#-----------------------------------------------------------------------------------------
+
 def _marking_id():
     _int = random.randint(1, 100)
     while True:
         _int += random.randint(1, 2)
         yield _int
 
+#-----------------------------------------------------------------------------------------
 # Instantiate the generator
+#-----------------------------------------------------------------------------------------
+
 marking_id = _marking_id()
 def ticket_header(ticket: str) -> ASObject:
     """
@@ -32,6 +40,9 @@ def ticket_header(ticket: str) -> ASObject:
     loc6 = binascii.hexlify(loc1bytes).decode()
     return ASObject({"Ticket": ticket + loc5 + loc6, "anyAttribute": None})
 
+#-----------------------------------------------------------------------------------------
+# Calculate main checksum to be included in request headers
+#-----------------------------------------------------------------------------------------
 
 def calculate_checksum(arguments: Union[int, str, bool, bytes, List[Union[int, str, bool, bytes]],
                                        dict, date, datetime, ASObject, TypedObject]) -> str:
@@ -105,7 +116,9 @@ def calculate_checksum(arguments: Union[int, str, bool, bytes, List[Union[int, s
     result_str = from_object_inner(arguments) + salt + get_ticket_value(arguments)
     return hashlib.sha1(result_str.encode()).hexdigest()
 
-
+#-----------------------------------------------------------------------------------------
+# Sending authenticated requests to the api
+#-----------------------------------------------------------------------------------------
 
 def invoke_method(server: str, method: str, params: list, session_id: str) -> tuple[int, any]:
     """
@@ -156,6 +169,9 @@ def invoke_method(server: str, method: str, params: list, session_id: str) -> tu
             return (resp.status, resp_data)
         return (resp.status, remoting.decode(resp_data)["/1"].body)
 
+#-----------------------------------------------------------------------------------------
+# Getting sessionid for requests
+#-----------------------------------------------------------------------------------------
 
 def get_session_id() -> str:
     """

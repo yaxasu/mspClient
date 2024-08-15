@@ -1,14 +1,25 @@
+#-----------------------------------------------------------------------------------------
+# 
+# MAIN MSP CLIENT
+#
+#-----------------------------------------------------------------------------------------
+
 import json
 import websocket
 import requests
 
+#-----------------------------------------------------------------------------------------
+# I've already done the groundwork by establishing the websocket connection.
+# Now, it just needs to be build out by adding more functions/features
+#-----------------------------------------------------------------------------------------
 class MSPClient:
     def __init__(self, server, profile_id, access_token):
         self.server = server
         self.profile_id = profile_id
         self.access_token = access_token
         self.ws = None
-
+    
+    # Making realtime connection to IP address provided by the servers loadbalancer
     def establish_connection(self):
         # Determine the correct server URL
         address = "https://presence-us.mspapis.com/getServer" if self.server == "us" else "https://presence.mspapis.com/getServer"
@@ -42,3 +53,7 @@ class MSPClient:
             print("WebSocket connection closed.")
         else:
             print("No WebSocket connection to close.")
+
+    #-------------------------------------------------------------------------------------
+    # Add more stuff under here. ex. def watchmovie(movie_id), etc.
+    #-------------------------------------------------------------------------------------

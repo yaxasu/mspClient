@@ -1,9 +1,15 @@
+#-----------------------------------------------------------------------------------------
+# 
+# Main file to be edited for establishing the client, and interacting with the API
+#
+#-----------------------------------------------------------------------------------------
+
 from msp import invoke_method, get_session_id, ticket_header
 from client import MSPClient
 import time
 
 #-----------------------------------------------------------------------------------------
-# Edit this as needed
+# Edit login info as needed
 #-----------------------------------------------------------------------------------------
 
 USERNAME = ""
@@ -41,21 +47,21 @@ ticket = resp['loginStatus']['ticket']
 access_token = resp['loginStatus']['nebulaLoginStatus']['accessToken']
 profile_id = resp['loginStatus']['nebulaLoginStatus']['profileId']
 
-# Actually establish websocket connection
+# Actually establish the websocket connection
 client = MSPClient(SERVER, profile_id, access_token)
 client.establish_connection()
 
 #-----------------------------------------------------------------------------------------
-# Make requests and edit stuff here
+# Make requests and edit stuff under this! :)
 #-----------------------------------------------------------------------------------------
 
 
 code, resp = invoke_method(
     SERVER,
-    "MovieStarPlanet.WebService.MovieService.AMFMovieService.GetMovieById",
+    "MovieStarPlanet.WebService.UserSession.AMFUserSessionService.LoadActorDetailsExtended", 
     [
         ticket_header(ticket),
-        33086376
+        actor_id
     ],
     get_session_id()
 )
