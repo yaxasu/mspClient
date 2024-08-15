@@ -105,6 +105,20 @@ class MSPClient:
         )
         return resp
     
+    # Query for user details. *EDIT RETURN INFO AS NEEDED*
+    def mspQuery(self, friend_actor_id):
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.AMFActorService.BulkLoadActors",
+            [
+                ticket_header(self.ticket),
+                [friend_actor_id]
+            ],
+            get_session_id()
+        )
+        return [resp[0]['Money'], resp[0]["Diamonds"]]
+
+    # Send autograph
     def sendAutograph(self, friend_actor_id):
         code, resp = invoke_method(
             self.server,

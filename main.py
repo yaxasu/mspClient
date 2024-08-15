@@ -12,11 +12,9 @@ import time
 # Edit login info as needed
 #-----------------------------------------------------------------------------------------
 
-USERNAME = ""
-PASSWORD = ""
+USERNAME = "starwarfare123"
+PASSWORD = "nishit2003"
 SERVER = "us"
-
-FRIEND_USER = ""
 
 #-----------------------------------------------------------------------------------------
 # LOGIN STUFF - AMF request sent to api to recieve ticket, accesstoken, profileid, etc.
@@ -30,8 +28,8 @@ client.establish_websocket_connection()
 #-----------------------------------------------------------------------------------------
 # Make requests and edit stuff under this! :)
 #-----------------------------------------------------------------------------------------
-friend_actor = client.getActorIdFromUser(FRIEND_USER)
-resp = client.sendAutograph(friend_actor)
+friend_actor = client.getActorIdFromUser("yaxasu")
+resp = client.mspQuery(friend_actor)
 print(resp)
 
 #-----------------------------------------------------------------------------------------
