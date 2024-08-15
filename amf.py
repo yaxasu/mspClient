@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------------------------
 # 
-# A python implementation of interacting with msps API with websockets
+# AMF stuff needed for sending authenticated requests to the api
 #
 #-----------------------------------------------------------------------------------------
 
@@ -117,7 +117,7 @@ def calculate_checksum(arguments: Union[int, str, bool, bytes, List[Union[int, s
     return hashlib.sha1(result_str.encode()).hexdigest()
 
 #-----------------------------------------------------------------------------------------
-# Sending authenticated requests to the api
+# Sending amf request to api
 #-----------------------------------------------------------------------------------------
 
 def invoke_method(server: str, method: str, params: list, session_id: str) -> tuple[int, any]:
