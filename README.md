@@ -26,3 +26,24 @@ code, resp = invoke_method(
     ],
     get_session_id()
 )
+
+code, resp = invoke_method(
+    SERVER,
+    "MovieStarPlanet.WebService.UserSession.AMFUserSessionService.GiveAutographAndCalculateTimestamp",
+    [
+        ticket_header(ticket),
+        actor_id,
+        friend_actor
+    ],
+    get_session_id()
+)
+
+
+code, resp = invoke_method(
+    SERVER,
+    "MovieStarPlanet.WebService.UserSession.AMFUserSessionService.GetActorIdFromName",
+    [
+        "starwarfare123"
+    ],
+    get_session_id()
+)
