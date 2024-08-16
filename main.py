@@ -32,12 +32,12 @@ client.establish_websocket_connection()
 #-----------------------------------------------------------------------------------------
 
 frienndd = client.getActorIdFromUser(FRIEND_USERNAME)
-resp = client.mspQuery(frienndd)
-print(resp)
+idd = client.getMovieIdFromActorId(frienndd)
+response = client.watchMovie(idd)
+print(response)
 
 #-----------------------------------------------------------------------------------------
 # Close the connection once requests are done
 #-----------------------------------------------------------------------------------------
 
-time.sleep(3)
 client.close_connection()
