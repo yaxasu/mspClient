@@ -8,21 +8,22 @@ import json
 import websocket
 import requests
 from amf import invoke_method, get_session_id, ticket_header
+from datetime import datetime
 
 #-----------------------------------------------------------------------------------------
-# I've already done the groundwork by establishing the websocket connection.
-# Now, it just needs to be build out by adding more functions/features
+# Needs to be built out by adding more functions/features
 #-----------------------------------------------------------------------------------------
 class MSPClient:
-    def __init__(self, server, actor_id, name, ticket, access_token, profile_id ):
+    def __init__(self, server, actor_id, name, ticket, access_token, profile_id, culture):
         self.server = server
         self.actor_id = actor_id
         self.name = name
         self.ticket = ticket
         self.access_token = access_token
         self.profile_id = profile_id
+        self.culture = culture
         self.ws = None
-    
+        
     # Making realtime connection to IP address provided by the servers loadbalancer
     def establish_websocket_connection(self):
         # Determine the correct server URL
@@ -59,10 +60,6 @@ class MSPClient:
         else:
             print("No WebSocket connection to close.")
 
-    #-------------------------------------------------------------------------------------
-    # Add more stuff under here. ex. def watchmovie(movie_id), etc.
-    #-------------------------------------------------------------------------------------
-
     # Login for user must be done before websocket connection
     def userLogin(server, username, password):
         code, resp = invoke_method(
@@ -79,7 +76,7 @@ class MSPClient:
             get_session_id()
         )
 
-        status = resp.get('loginStatus', {}).get('status')
+        status = resp['loginStatus']['status']
         if status != "Success":
             print(f"Login failed, status: {status}")
             quit()
@@ -90,9 +87,14 @@ class MSPClient:
         ticket = resp['loginStatus']['ticket']
         access_token = resp['loginStatus']['nebulaLoginStatus']['accessToken']
         profile_id = resp['loginStatus']['nebulaLoginStatus']['profileId']
+        culture = resp['loginStatus']['actorLocale'][0]
 
-        return [actor_id, name, ticket, access_token, profile_id]
-    
+        return [actor_id, name, ticket, access_token, profile_id, culture]
+
+    #-------------------------------------------------------------------------------------
+    # Add more stuff under here. ex. def watchmovie(movie_id), etc.
+    #-------------------------------------------------------------------------------------
+
     # Get ActorId from username
     def getActorIdFromUser(self, user):
         code, resp = invoke_method(
@@ -127,6 +129,36 @@ class MSPClient:
                 ticket_header(self.ticket),
                 self.actor_id,
                 friend_actor_id
+            ],
+            get_session_id()
+        )
+        return resp
+    
+    # Get MovieId from actorid
+    def getMovieIdFromActorId(self, friend_actor):
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.MovieService.AMFMovieService.GetMovieListForActor",
+            [
+                ticket_header(self.ticket),
+                friend_actor,
+                2,
+                0,
+                16
+            ],
+            get_session_id()
+        )
+        return resp["list"][0]["movieId"]
+    
+    # Watch movie
+    def watchMovie(self, movieId):
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.MovieService.AMFMovieService.MovieWatched",
+            [
+                ticket_header(self.ticket),
+                movieId,
+                self.actor_id
             ],
             get_session_id()
         )
