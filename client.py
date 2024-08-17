@@ -164,3 +164,52 @@ class MSPClient:
             get_session_id()
         )
         return resp
+    
+
+    def viewGift(self):
+        # View the gift
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.Gifts.AMFGiftsService+Version2.GetGiftsNewPaged",
+            [
+                ticket_header(self.ticket),
+                self.actor_id,
+                0,
+                6
+            ],
+            get_session_id()
+        )
+        giftId = resp['Items'][0]['GiftId']
+        # actorClothesRelId = resp['Items'][0]['ActorClothesRelId']
+        return int(giftId)
+    
+    def openGift(self, gift_id):
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.Gifts.AMFGiftsService+Version2.OpenGift",
+            [
+                ticket_header(self.ticket),
+                self.actor_id,
+                gift_id
+            ],
+            get_session_id()
+        )
+        print(resp)
+
+    # Send Gift
+    def sendGift(self, friend_actor, gift_id):
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.Gifts.AMFGiftsService+Version2.GiveGiftOfCategory",
+            [
+                ticket_header(self.ticket),
+                self.actor_id,
+                friend_actor,
+                gift_id,
+                0,
+                1,
+                "Gift_item_3.swf"
+            ],
+            get_session_id()
+        )
+        print(resp)

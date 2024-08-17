@@ -12,11 +12,11 @@ import time
 # Edit login info as needed
 #-----------------------------------------------------------------------------------------
 
-USERNAME = f"soialix5"
+USERNAME = f"starwarfare123"
 PASSWORD = "nishit2003"
 SERVER = "us"
 
-FRIEND_USERNAME = "ziki!"
+FRIEND_USERNAME = "sirneel"
 
 #-----------------------------------------------------------------------------------------
 # LOGIN STUFF - AMF request sent to api to recieve ticket, accesstoken, profileid, etc.
@@ -32,11 +32,9 @@ client.establish_websocket_connection()
 #-----------------------------------------------------------------------------------------
 
 friendd = client.getActorIdFromUser(FRIEND_USERNAME)
-moviee = client.getMovieIdFromActorId(friendd)
-response = client.watchMovie(moviee)
-print(response)
 
-# 33086760
+
+
 #-----------------------------------------------------------------------------------------
 # Close the connection once requests are done
 #-----------------------------------------------------------------------------------------
