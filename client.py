@@ -151,8 +151,19 @@ class MSPClient:
         return resp["list"][0]["movieId"]
     
     # Watch movie
+    
+    def getMovie(self, movieId):
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.MovieService.AMFMovieService.GetMovieById",
+            [
+                ticket_header(self.ticket),
+                movieId,
+            ],
+            get_session_id()
+        )
+        return resp
     def watchMovie(self, movieId):
-        
         code, resp = invoke_method(
             self.server,
             "MovieStarPlanet.WebService.MovieService.AMFMovieService.MovieWatched",
@@ -194,7 +205,7 @@ class MSPClient:
             ],
             get_session_id()
         )
-        print(resp)
+        return (resp)
 
     # Send Gift
     def sendGift(self, friend_actor, gift_id):
@@ -213,3 +224,17 @@ class MSPClient:
             get_session_id()
         )
         print(resp)
+
+    def dailyAward(self):
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.Awarding.AMFAwardingService.claimDailyAward",
+            [
+                ticket_header(self.ticket),
+                "wheel",
+                120,
+                self.actor_id
+            ],
+            get_session_id()
+        )
+        return resp
