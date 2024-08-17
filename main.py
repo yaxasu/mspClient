@@ -28,12 +28,10 @@ client = MSPClient(SERVER, res[0], res[1], res[2], res[3], res[4], res[5])
 client.establish_websocket_connection()
 
 #-----------------------------------------------------------------------------------------
-# Make requests and edit stuff under this! :)
+# Make requests and edit stuff under this
 #-----------------------------------------------------------------------------------------
 
-frienndd = client.getActorIdFromUser(FRIEND_USERNAME)
-idd = client.getMovieIdFromActorId(frienndd)
-response = client.watchMovie(idd)
+response = client.watchMovie(33086760)
 print(response)
 
 #-----------------------------------------------------------------------------------------

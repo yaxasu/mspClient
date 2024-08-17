@@ -148,7 +148,7 @@ class MSPClient:
             ],
             get_session_id()
         )
-        return resp["list"][0]["movieId"]
+        return resp["list"][2]["movieId"]
     
     # Watch movie
     def watchMovie(self, movieId):
@@ -162,4 +162,22 @@ class MSPClient:
             ],
             get_session_id()
         )
-        return resp
+        watchResp = resp
+        code, resp = invoke_method(
+            self.server,
+            "Moviestarplanet.WebService.MovieService.AMFMovieService.RateMovie",
+            [
+                ticket_header(self.ticket),
+                {
+                    "ActorId" : self.actor_id,
+                    "RateMovieId" : 0,
+                    "RateDate" : datetime.now(),
+                    "MovieId" : movieId,
+                    "Comment" : ":)",
+                    "Score" : 5
+                }
+            ],
+            get_session_id()
+        )
+        rateResp = resp
+        return [watchResp, rateResp]
