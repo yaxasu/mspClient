@@ -30,3 +30,33 @@ def pixeler():
 
     client1.close_connection()
     client2.close_connection()
+
+# pixeler()
+
+def watchMovie(movieId):
+    with open("bots.txt", "r") as bots_file:
+        accounts = bots_file.readlines()
+
+    for account in accounts:
+        account = account.strip()
+        username, password = account.split(":")
+        server = "us"
+
+        print(username)
+
+        res = MSPClient.userLogin(server, username, password)
+        client = MSPClient(server, res[0], res[1], res[2], res[3], res[4], res[5])
+        client.establish_websocket_connection()
+        client.validateBot()
+
+        res = client.watchMovie(movieId)
+        print(res)
+        
+        client.close_connection()
+
+        x = input()
+        if x == "q":
+            quit()
+
+#watchMovie(33086999)
+

@@ -118,7 +118,7 @@ class MSPClient:
             ],
             get_session_id()
         )
-        return [resp[0]['Money'], resp[0]["Diamonds"]]
+        return [resp[0]['Money'], resp[0]["Diamonds"], resp[0]["Fame"]]
 
     # Send autograph
     def sendAutograph(self, friend_actor_id):
@@ -225,7 +225,7 @@ class MSPClient:
         )
         print(resp)
 
-    def dailyAward(self):
+    def validateBot(self):
         code, resp = invoke_method(
             self.server,
             "MovieStarPlanet.WebService.Awarding.AMFAwardingService.claimDailyAward",
@@ -237,4 +237,25 @@ class MSPClient:
             ],
             get_session_id()
         )
-        return resp
+        # code, resp = invoke_method(
+        #     self.server,
+        #     "MovieStarPlanet.WebService.Awarding.AMFAwardingService.claimDailyAward",
+        #     [
+        #         ticket_header(self.ticket),
+        #         "starwheel",
+        #         120,
+        #         self.actor_id
+        #     ],
+        #     get_session_id()
+        # )
+        # code, resp = invoke_method(
+        #     self.server,
+        #     "MovieStarPlanet.WebService.AMFAwardingService.claimDailyAward",
+        #     [
+        #         ticket_header(self.ticket),
+        #         "twoPlayerFame",
+        #         50,
+        #         self.actor_id
+        #     ],
+        #     get_session_id()
+        # )

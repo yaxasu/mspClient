@@ -7,16 +7,16 @@
 from amf import invoke_method, get_session_id, ticket_header
 from client import MSPClient
 import time
-
 #-----------------------------------------------------------------------------------------
 # Edit login info as needed
 #-----------------------------------------------------------------------------------------
 
-USERNAME = f"npm20"
-PASSWORD = "2003nishit"
+USERNAME = f"starwarfare123"
+PASSWORD = "nishit2003"
 SERVER = "us"
 
-FRIEND_USERNAME = "starwarfare123"
+friendd = "trinnieboo1"
+
 
 #-----------------------------------------------------------------------------------------
 # LOGIN STUFF - AMF request sent to api to recieve ticket, accesstoken, profileid, etc.
@@ -30,11 +30,11 @@ client.establish_websocket_connection()
 #-----------------------------------------------------------------------------------------
 # Make requests and edit stuff under this
 #-----------------------------------------------------------------------------------------
+client.validateBot()
+testtin = client.getActorIdFromUser(friendd)
+resp = client.mspQuery(testtin)
 
-client.dailyAward()
-
-res = client.watchMovie(33086760)
-print(res)
+print(resp)
 
 
 #-----------------------------------------------------------------------------------------
