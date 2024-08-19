@@ -4,7 +4,7 @@
 #
 #-----------------------------------------------------------------------------------------
 
-from amf import invoke_method, get_session_id, ticket_header
+from msp import invoke_method, get_session_id, ticket_header
 from client import MSPClient
 import time
 #-----------------------------------------------------------------------------------------

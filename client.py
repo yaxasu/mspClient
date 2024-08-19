@@ -7,7 +7,7 @@
 import json
 import websocket
 import requests
-from amf import invoke_method, get_session_id, ticket_header
+from msp import invoke_method, get_session_id, ticket_header
 from datetime import datetime
 
 #-----------------------------------------------------------------------------------------
@@ -68,7 +68,10 @@ class MSPClient:
             [
                 username,
                 password,
-                [],
+                [
+                    -1053206098,
+                    -1977661620
+                ],
                 None,
                 None,
                 "MSP1-Standalone:XXXXXX"
