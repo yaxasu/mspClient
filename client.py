@@ -13,6 +13,10 @@ import requests
 import data_pb2
 from google.protobuf.json_format import MessageToJson
 import re
+import hashlib
+import hmac
+import locale
+
 
 #-----------------------------------------------------------------------------------------
 # Needs to be built out by adding more functions/features
@@ -28,6 +32,37 @@ class MSPClient:
         self.culture = culture
         self.ws = None
         
+    @staticmethod
+    def user_login(server, username, password):
+        """Login to the MSP server and retrieve user information."""
+        code, resp = invoke_method(
+            server,
+            "MovieStarPlanet.WebService.User.AMFUserServiceWeb.Login",
+            [
+                username,
+                password,
+                [],
+                None,
+                None,
+                "MSP1-Standalone:XXXXXX"
+            ],
+            get_session_id()
+        )
+
+        status = resp['loginStatus']['status']
+        if status != "Success":
+            print(f"Login failed, status: {status}")
+            quit()
+
+        actor_id = resp['loginStatus']['actor']['ActorId']
+        name = resp['loginStatus']['actor']['Name']
+        ticket = resp['loginStatus']['ticket']
+        access_token = resp['loginStatus']['nebulaLoginStatus']['accessToken']
+        profile_id = resp['loginStatus']['nebulaLoginStatus']['profileId']
+        culture = resp['loginStatus']['actorLocale'][0]
+
+        return [actor_id, name, ticket, access_token, profile_id, culture]
+
     def establish_websocket_connection(self):
         """Establish a WebSocket connection to the server."""
         address = "https://presence-us.mspapis.com/getServer" if self.server == "us" else "https://presence.mspapis.com/getServer"
@@ -60,37 +95,6 @@ class MSPClient:
             print("WebSocket connection closed.")
         else:
             print("No WebSocket connection to close.")
-
-    @staticmethod
-    def user_login(server, username, password):
-        """Login to the MSP server and retrieve user information."""
-        code, resp = invoke_method(
-            server,
-            "MovieStarPlanet.WebService.User.AMFUserServiceWeb.Login",
-            [
-                username,
-                password,
-                [],
-                None,
-                None,
-                "MSP1-Standalone:XXXXXX"
-            ],
-            get_session_id()
-        )
-
-        status = resp['loginStatus']['status']
-        if status != "Success":
-            print(f"Login failed, status: {status}")
-            quit()
-
-        actor_id = resp['loginStatus']['actor']['ActorId']
-        name = resp['loginStatus']['actor']['Name']
-        ticket = resp['loginStatus']['ticket']
-        access_token = resp['loginStatus']['nebulaLoginStatus']['accessToken']
-        profile_id = resp['loginStatus']['nebulaLoginStatus']['profileId']
-        culture = resp['loginStatus']['actorLocale'][0]
-
-        return [actor_id, name, ticket, access_token, profile_id, culture]
 
     def get_actor_id_from_user(self, user):
         """Get the ActorId from the username."""
@@ -322,3 +326,52 @@ class MSPClient:
 
         except Exception as e:
             return f"Error: {str(e)}"
+
+    def get_name_suggestion():
+        headers = {
+            "content-type": "application/x-amf",
+            "x-flash-version": "32,0,0,170",
+            "accept-language": "en-us",
+            "user-agent": "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en) AppleWebKit/533.19.4 (KHTML, like Gecko) AdobeAIR/32.0",
+            'Connection': 'keep-alive'
+        }
+        url = f"https://us.mspapis.com/profileidentity/v1/profiles/names/suggestions/?&gameId=5ooi&culture=en-US"
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        response.raise_for_status()
+        name_suggestion = json.loads(response.text)
+        concatenated_name = "".join(name_suggestion)
+        return concatenated_name
+    
+    def create_checksum(server, password, username):
+        secret_key = "7jA7^kAZSHtjxDAa"
+        message = f"5ooi{server}{password}{username}false"
+        signature = hmac.new(secret_key.encode('utf-8'), message.encode('utf-8'), hashlib.sha256).hexdigest()
+        return signature.lower()
+
+    def register_login_profile(server, password, username, checksum, captcha_token):
+        url = f"https://{'us' if server.upper() == 'US' else 'eu'}.mspapis.com/edgelogins/graphql/graphql"
+        headers = {'Content-Type': 'application/json'}
+        payload = {
+            "query": """mutation create ($loginName: String!, $password: String!, $gameId: String!, $isGuest: Boolean!, $countryCode: Region!, $checksum: String!, $recaptchaV3Token: String ){
+                        createLoginProfile(input: { name: $loginName, password: $password, gameId: $gameId, region: $countryCode, isGuest: $isGuest }, 
+                        verify: {checksum: $checksum, recaptchaV3Token: $recaptchaV3Token } ) {
+                        success,loginProfile {loginId,loginName,profileId,profileName,isGuest},error}}""",
+            "variables": {
+                "checksum": checksum,
+                "loginName": username,
+                "password": password,
+                "gameId": "5ooi",
+                "isGuest": False,
+                "countryCode": server.upper(),
+                "recaptchaV3Token": captcha_token
+            },
+            "operationName": ""
+        }
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        return response.json()
+    
+    def bot_generator(self):
+        
+

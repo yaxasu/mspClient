@@ -1,4 +1,5 @@
 from client import MSPClient
 
-res = MSPClient.captcha_v3()
+res = MSPClient.create_checksum("us","2003nishit","starwarfare123")
+
 print(res)
