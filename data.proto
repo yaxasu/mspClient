@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+message ProtobufData {
+    string A = 1;
+    string B = 2;
+    string C = 4;
+    string D = 5;
+    string E = 6;
+    string F = 8;
+    string G = 14;
+    string H = 16;
+}
