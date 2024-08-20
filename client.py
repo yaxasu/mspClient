@@ -24,19 +24,16 @@ class MSPClient:
         self.culture = culture
         self.ws = None
         
-    # Making realtime connection to IP address provided by the servers loadbalancer
     def establish_websocket_connection(self):
-        # Determine the correct server URL
+        """Establish a WebSocket connection to the server."""
         address = "https://presence-us.mspapis.com/getServer" if self.server == "us" else "https://presence.mspapis.com/getServer"
         formatted_address = requests.get(address).text.replace('-', '.')
         formatted_url = f"ws://{formatted_address}:10843/{formatted_address.replace('.', '-')}/?transport=websocket"
         
-        # Establish the WebSocket connection
         self.ws = websocket.WebSocket()
         self.ws.connect(formatted_url)
         print("WebSocket connection established.")
 
-        # Prepare and send the message payload
         message_payload = json.dumps([
             "10", {
                 "messageType": 10,
@@ -52,23 +49,24 @@ class MSPClient:
         self.ws.send(f"42{message_payload}")
         print("Message sent.")
 
-    # Close websocket connection
     def close_connection(self):
+        """Close the WebSocket connection."""
         if self.ws:
             self.ws.close()
             print("WebSocket connection closed.")
         else:
             print("No WebSocket connection to close.")
 
-    # Login for user must be done before websocket connection
-    def userLogin(server, username, password):
+    @staticmethod
+    def user_login(server, username, password):
+        """Login to the MSP server and retrieve user information."""
         code, resp = invoke_method(
             server,
             "MovieStarPlanet.WebService.User.AMFUserServiceWeb.Login",
             [
                 username,
                 password,
-                [ ],
+                [],
                 None,
                 None,
                 "MSP1-Standalone:XXXXXX"
@@ -81,7 +79,6 @@ class MSPClient:
             print(f"Login failed, status: {status}")
             quit()
 
-        # Retrieve stuff from login response
         actor_id = resp['loginStatus']['actor']['ActorId']
         name = resp['loginStatus']['actor']['Name']
         ticket = resp['loginStatus']['ticket']
@@ -91,24 +88,18 @@ class MSPClient:
 
         return [actor_id, name, ticket, access_token, profile_id, culture]
 
-    #-------------------------------------------------------------------------------------
-    # Add more stuff under here. ex. def watchmovie(movie_id), etc.
-    #-------------------------------------------------------------------------------------
-
-    # Get ActorId from username
-    def getActorIdFromUser(self, user):
+    def get_actor_id_from_user(self, user):
+        """Get the ActorId from the username."""
         code, resp = invoke_method(
             self.server,
             "MovieStarPlanet.WebService.UserSession.AMFUserSessionService.GetActorIdFromName",
-            [
-                user
-            ],
+            [user],
             get_session_id()
         )
         return resp
     
-    # Query for user details. *EDIT RETURN INFO AS NEEDED*
-    def mspQuery(self, friend_actor_id):
+    def msp_query(self, friend_actor_id):
+        """Query for user details."""
         code, resp = invoke_method(
             self.server,
             "MovieStarPlanet.WebService.AMFActorService.BulkLoadActors",
@@ -120,8 +111,8 @@ class MSPClient:
         )
         return [resp[0]['Money'], resp[0]["Diamonds"], resp[0]["Fame"]]
 
-    # Send autograph
-    def sendAutograph(self, friend_actor_id):
+    def send_autograph(self, friend_actor_id):
+        """Send an autograph to a friend."""
         code, resp = invoke_method(
             self.server,
             "MovieStarPlanet.WebService.UserSession.AMFUserSessionService.GiveAutographAndCalculateTimestamp",
@@ -134,8 +125,8 @@ class MSPClient:
         )
         return resp
     
-    # Get MovieId from actorid
-    def getMovieIdFromActorId(self, friend_actor):
+    def get_movie_id_from_actor_id(self, friend_actor):
+        """Get MovieId from ActorId."""
         code, resp = invoke_method(
             self.server,
             "MovieStarPlanet.WebService.MovieService.AMFMovieService.GetMovieListForActor",
@@ -150,35 +141,35 @@ class MSPClient:
         )
         return resp["list"][0]["movieId"]
     
-    # Watch movie
-    
-    def getMovie(self, movieId):
+    def get_movie(self, movie_id):
+        """Retrieve a movie by its ID."""
         code, resp = invoke_method(
             self.server,
             "MovieStarPlanet.WebService.MovieService.AMFMovieService.GetMovieById",
             [
                 ticket_header(self.ticket),
-                movieId,
-            ],
-            get_session_id()
-        )
-        return resp
-    def watchMovie(self, movieId):
-        code, resp = invoke_method(
-            self.server,
-            "MovieStarPlanet.WebService.MovieService.AMFMovieService.MovieWatched",
-            [
-                ticket_header(self.ticket),
-                movieId,
-                self.actor_id
+                movie_id,
             ],
             get_session_id()
         )
         return resp
     
+    def watch_movie(self, movie_id):
+        """Mark a movie as watched."""
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.MovieService.AMFMovieService.MovieWatched",
+            [
+                ticket_header(self.ticket),
+                movie_id,
+                self.actor_id
+            ],
+            get_session_id()
+        )
+        return resp
 
-    def viewGift(self):
-        # View the gift
+    def view_gift(self):
+        """View the latest gift."""
         code, resp = invoke_method(
             self.server,
             "MovieStarPlanet.WebService.Gifts.AMFGiftsService+Version2.GetGiftsNewPaged",
@@ -190,11 +181,11 @@ class MSPClient:
             ],
             get_session_id()
         )
-        giftId = resp['Items'][0]['GiftId']
-        # actorClothesRelId = resp['Items'][0]['ActorClothesRelId']
-        return int(giftId)
+        gift_id = resp['Items'][0]['GiftId']
+        return int(gift_id)
     
-    def openGift(self, gift_id):
+    def open_gift(self, gift_id):
+        """Open a gift."""
         code, resp = invoke_method(
             self.server,
             "MovieStarPlanet.WebService.Gifts.AMFGiftsService+Version2.OpenGift",
@@ -205,10 +196,10 @@ class MSPClient:
             ],
             get_session_id()
         )
-        return (resp)
+        return resp
 
-    # Send Gift
-    def sendGift(self, friend_actor, gift_id):
+    def send_gift(self, friend_actor, gift_id):
+        """Send a gift to a friend."""
         code, resp = invoke_method(
             self.server,
             "MovieStarPlanet.WebService.Gifts.AMFGiftsService+Version2.GiveGiftOfCategory",
@@ -225,7 +216,8 @@ class MSPClient:
         )
         print(resp)
 
-    def validateBot(self):
+    def validate_bot(self):
+        """Validate the bot by claiming a daily award."""
         code, resp = invoke_method(
             self.server,
             "MovieStarPlanet.WebService.Awarding.AMFAwardingService.claimDailyAward",
@@ -237,25 +229,62 @@ class MSPClient:
             ],
             get_session_id()
         )
-        # code, resp = invoke_method(
-        #     self.server,
-        #     "MovieStarPlanet.WebService.Awarding.AMFAwardingService.claimDailyAward",
-        #     [
-        #         ticket_header(self.ticket),
-        #         "starwheel",
-        #         120,
-        #         self.actor_id
-        #     ],
-        #     get_session_id()
-        # )
-        # code, resp = invoke_method(
-        #     self.server,
-        #     "MovieStarPlanet.WebService.AMFAwardingService.claimDailyAward",
-        #     [
-        #         ticket_header(self.ticket),
-        #         "twoPlayerFame",
-        #         50,
-        #         self.actor_id
-        #     ],
-        #     get_session_id()
-        # )
+        print(resp)
+
+    def feed_bonster(self, bonster_id):
+        """Feed a bonster."""
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.Bonster.AMFBonsterService.FeedBonster",
+            [
+                ticket_header(self.ticket),
+                bonster_id,
+                6,
+                self.actor_id
+            ],
+            get_session_id()
+        )
+        print(resp)
+
+    def wash_bonster(self, bonster_id):
+        """Wash a bonster."""
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.Bonster.AMFBonsterService.WashBonster",
+            [
+                ticket_header(self.ticket),
+                bonster_id,
+                100,
+                self.actor_id
+            ],
+            get_session_id()
+        )
+        print(resp)
+    
+    def play_with_bonster(self, bonster_id):
+        """Play with a bonster."""
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.Bonster.AMFBonsterService.PlayWithBonster",
+            [
+                ticket_header(self.ticket),
+                bonster_id,
+                100,
+                self.actor_id
+            ],
+            get_session_id()
+        )
+        print(resp)
+
+    def buy_fame_booster(self):
+        """Buy a fame booster."""
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.Spending.AMFSpendingService.BuyFameBooster",
+            [
+                ticket_header(self.ticket),
+                self.actor_id
+            ],
+            get_session_id()
+        )
+        return resp

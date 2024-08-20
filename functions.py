@@ -1,87 +1,112 @@
 from client import MSPClient
 import time
-import random
 
 def pixeler():
-    user1 = "sirneel"
-    pass1 = "2003nishit"
-    user2 = "starwarfare123"
-    pass2 = "nishit2003"
-    giftActor = 2016815973
-
+    """
+    Function to automate gift exchange and fame boosting between two accounts.
+    """
     server = "us"
+    gift_actor_id = 2016815973
 
-    res1 = MSPClient.userLogin(server, user1, pass1)
-    res2 = MSPClient.userLogin(server, user2, pass2)
+    # Login information for two accounts
+    accounts = [
+        ("sirneel", "2003nishit"),
+        ("starwarfare123", "nishit2003")
+    ]
 
-    client1 = MSPClient(server, res1[0], res1[1], res1[2], res1[3], res1[4], res1[5])
-    client2 = MSPClient(server, res2[0], res2[1], res2[2], res2[3], res2[4], res2[5])
-
-    client1.establish_websocket_connection()
-    client2.establish_websocket_connection()
-
-    for i in range(25):
-        client1.sendGift(client2.actor_id, giftActor)
-
-        giftId = client2.viewGift()
-        client2.openGift(giftId)
-        client2.sendGift(client1.actor_id, giftActor)
-
-        giftId = client1.viewGift()
-        client1.openGift(giftId)
-
-    client1.close_connection()
-    client2.close_connection()
-
-#pixeler()
-
-def watchMovie():
-    with open("bots.txt", "r") as bots_file:
-        accounts = bots_file.readlines()
-
-    for account in accounts:
-        account = account.strip()
-        username, password = account.split(":")
-        server = "us"
-
-        print(username)
-
-        res = MSPClient.userLogin(server, username, password)
-        client = MSPClient(server, res[0], res[1], res[2], res[3], res[4], res[5])
+    # Login and establish connections for both clients
+    clients = []
+    for username, password in accounts:
+        res = MSPClient.user_login(server, username, password)
+        client = MSPClient(server, *res)
         client.establish_websocket_connection()
-        client.validateBot()
+        clients.append(client)
 
-        res = client.watchMovie(33087158)
-        print(f"Movie 1: {res}")
-        
+    # First client buys a fame booster
+    clients[0].buy_fame_booster()
+
+    # Perform gift exchange between the two accounts
+    for _ in range(25):
+        clients[0].send_gift(clients[1].actor_id, gift_actor_id)
+        gift_id = clients[1].view_gift()
+        clients[1].open_gift(gift_id)
+        clients[1].send_gift(clients[0].actor_id, gift_actor_id)
+        gift_id = clients[0].view_gift()
+        clients[0].open_gift(gift_id)
+
+    # Close connections
+    for client in clients:
         client.close_connection()
-        x = input()
-        if x == "q":
-            quit()
 
-#watchMovie()
+def watch_movie():
+    """
+    Function to automate the process of watching a specific movie using multiple accounts.
+    """
+    server = "us"
+    movie_id = 33087158
 
-def giveAutos():
     with open("bots.txt", "r") as bots_file:
-        accounts = bots_file.readlines()
+        accounts = [line.strip().split(":") for line in bots_file]
 
-    for account in accounts:
-        account = account.strip()
-        username, password = account.split(":")
-        server = "us"
-
-        print(username)
-
-        res = MSPClient.userLogin(server, username, password)
-        client = MSPClient(server, res[0], res[1], res[2], res[3], res[4], res[5])
+    for username, password in accounts:
+        print(f"Processing account: {username}")
+        
+        res = MSPClient.user_login(server, username, password)
+        client = MSPClient(server, *res)
         client.establish_websocket_connection()
-        client.validateBot()
+        client.validate_bot()
 
-        friendd = client.getActorIdFromUser("sirneel")
-        res = client.sendAutograph(friendd)
-        print(res)
+        res = client.watch_movie(movie_id)
+        print(f"Watched Movie: {res}")
+
+        client.close_connection()
+
+        if input("Press 'q' to quit, any other key to continue: ") == "q":
+            break
+
+def give_autographs():
+    """
+    Function to send autographs from multiple accounts to a specified user.
+    """
+    server = "us"
+    target_user = "sirneel"
+
+    with open("bots.txt", "r") as bots_file:
+        accounts = [line.strip().split(":") for line in bots_file]
+
+    for username, password in accounts:
+        print(f"Processing account: {username}")
+        
+        res = MSPClient.user_login(server, username, password)
+        client = MSPClient(server, *res)
+        client.establish_websocket_connection()
+        client.validate_bot()
+
+        friend_actor_id = client.get_actor_id_from_user(target_user)
+        res = client.send_autograph(friend_actor_id)
+        print(f"Autograph sent: {res}")
+
+        time.sleep(2)
+        client.close_connection()
+
+def care_for_bonsters():
+    """
+    Function to automate feeding, washing, and playing with bonsters.
+    """
+    username, password = "sirneel", "2003nishit"
+    server = "us"
+    bonster_ids = [4818939, 4818932, 4818936, 4818934, 4818938, 4818937, 4818933, 4818935, 4818931, 4818273]
+
+    res = MSPClient.user_login(server, username, password)
+    client = MSPClient(server, *res)
+    client.establish_websocket_connection()
+    client.validate_bot()
+
+    for bonster_id in bonster_ids:
+        for _ in range(5):
+            print(f"Feeding Bonster {bonster_id}: {client.feed_bonster(bonster_id)}")
+        print(f"Washing Bonster {bonster_id}: {client.wash_bonster(bonster_id)}")
+        print(f"Playing with Bonster {bonster_id}: {client.play_with_bonster(bonster_id)}")
         time.sleep(2)
 
-        client.close_connection()
-
-#giveAutos()
+    client.close_connection()
