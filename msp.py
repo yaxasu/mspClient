@@ -131,7 +131,8 @@ def invoke_method(server: str, method: str, params: list, session: str) -> tuple
         full_endpoint,
         impersonate="chrome",
         headers=headers,
-        data=encoded_req
+        data=encoded_req,
+        timeout=60
     )
         
     if response.status_code != 200:

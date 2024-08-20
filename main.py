@@ -15,7 +15,7 @@ USERNAME = f"starwarfare123"
 PASSWORD = "nishit2003"
 SERVER = "us"
 
-friendd = "trinnieboo1"
+friendd = "meltice"
 
 
 #-----------------------------------------------------------------------------------------

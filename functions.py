@@ -1,4 +1,6 @@
 from client import MSPClient
+import time
+import random
 
 def pixeler():
     user1 = "sirneel"
@@ -31,9 +33,9 @@ def pixeler():
     client1.close_connection()
     client2.close_connection()
 
-# pixeler()
+#pixeler()
 
-def watchMovie(movieId):
+def watchMovie():
     with open("bots.txt", "r") as bots_file:
         accounts = bots_file.readlines()
 
@@ -49,14 +51,37 @@ def watchMovie(movieId):
         client.establish_websocket_connection()
         client.validateBot()
 
-        res = client.watchMovie(movieId)
-        print(res)
+        res = client.watchMovie(33087158)
+        print(f"Movie 1: {res}")
         
         client.close_connection()
-
         x = input()
         if x == "q":
             quit()
 
-#watchMovie(33086999)
+#watchMovie()
 
+def giveAutos():
+    with open("bots.txt", "r") as bots_file:
+        accounts = bots_file.readlines()
+
+    for account in accounts:
+        account = account.strip()
+        username, password = account.split(":")
+        server = "us"
+
+        print(username)
+
+        res = MSPClient.userLogin(server, username, password)
+        client = MSPClient(server, res[0], res[1], res[2], res[3], res[4], res[5])
+        client.establish_websocket_connection()
+        client.validateBot()
+
+        friendd = client.getActorIdFromUser("sirneel")
+        res = client.sendAutograph(friendd)
+        print(res)
+        time.sleep(2)
+
+        client.close_connection()
+
+#giveAutos()

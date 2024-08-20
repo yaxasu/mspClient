@@ -68,10 +68,7 @@ class MSPClient:
             [
                 username,
                 password,
-                [
-                    -1053206098,
-                    -1977661620
-                ],
+                [ ],
                 None,
                 None,
                 "MSP1-Standalone:XXXXXX"
