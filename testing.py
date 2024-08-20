@@ -3,7 +3,7 @@ from client import MSPClient
 import time
 import random
 
-def send_autograph_for_account(server, username, password, target_user, delay=1):
+def send_autograph_for_account(server, username, password, target_user):
     res = MSPClient.user_login(server, username, password)
     client = MSPClient(server, *res)
     client.establish_websocket_connection()
@@ -14,11 +14,10 @@ def send_autograph_for_account(server, username, password, target_user, delay=1)
     print(f"Autograph sent: {res}")
 
     client.close_connection()
-    time.sleep(delay)
 
 def give_autographs():
     server = "us"
-    target_user = "starwarfare123"
+    target_user = "// Kaylyn //"
 
     with open("bots.txt", "r") as bots_file:
         accounts = [line.strip().split(":") for line in bots_file]
@@ -26,7 +25,7 @@ def give_autographs():
     # Using multithreading to send autographs concurrently
     with ThreadPoolExecutor() as executor:
         futures = [
-            executor.submit(send_autograph_for_account, server, username, password, target_user, delay=1)
+            executor.submit(send_autograph_for_account, server, username, password, target_user)
             for username, password in accounts
          ]
         for future in futures:
@@ -51,7 +50,7 @@ def watch_movie():
         accounts = [line.strip().split(":") for line in bots_file]
 
     # Using multithreading to watch movies concurrently
-    with ThreadPoolExecutor(max_workers=3) as executor:
+    with ThreadPoolExecutor() as executor:
         futures = []
         for username, password in accounts:
             futures.append(executor.submit(watch_movie_for_account, server, username, password, movie_id))
@@ -61,4 +60,4 @@ def watch_movie():
 
 
 if __name__ == "__main__":
-    watch_movie()
+    give_autographs()
