@@ -23,7 +23,7 @@ def pixeler():
         clients.append(client)
 
     # First client buys a fame booster
-    clients[0].buy_fame_booster()
+    # clients[0].buy_fame_booster()
 
     # Perform gift exchange between the two accounts
     for _ in range(25):
@@ -69,7 +69,7 @@ def give_autographs():
     Function to send autographs from multiple accounts to a specified user.
     """
     server = "us"
-    target_user = "sirneel"
+    target_user = "simplyjas"
 
     with open("bots.txt", "r") as bots_file:
         accounts = [line.strip().split(":") for line in bots_file]
@@ -110,3 +110,6 @@ def care_for_bonsters():
         time.sleep(2)
 
     client.close_connection()
+
+# pixeler()
+# care_for_bonsters()

@@ -7,7 +7,7 @@
 import json
 import websocket
 import requests
-from msp import invoke_method, get_session_id, ticket_header
+from msp import invoke_method, get_session_id, ticket_header, calculate_checksum
 from datetime import datetime
 import requests
 import data_pb2
@@ -239,6 +239,34 @@ class MSPClient:
         )
         print(resp)
 
+    def lisa_coins(self):
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.AMFAwardService.claimDailyAward",
+            [
+                ticket_header(self.ticket),
+                "twoPlayerMoney",
+                50,
+                self.actor_id
+            ],
+            get_session_id()
+        )
+        return resp
+    
+    def lisa_fame(self):
+        code, resp = invoke_method(
+            self.server,
+            "MovieStarPlanet.WebService.AMFAwardService.claimDailyAward",
+            [
+                ticket_header(self.ticket),
+                "twoPlayerFame",
+                50,
+                self.actor_id
+            ],
+            get_session_id()
+        )
+        return resp
+
     def feed_bonster(self, bonster_id):
         """Feed a bonster."""
         code, resp = invoke_method(
@@ -297,14 +325,14 @@ class MSPClient:
         )
         return resp
     
-    def captcha_v3():
+    def captcha_v3(self):
         """Generate a valid captcha string"""
         try:
             url = "https://www.google.com/recaptcha/api2/anchor?ar=1&k=6LcxuOsUAAAAAI2IYDfxOvAZrwRg2T1E7sJq96eg&co=aHR0cHM6Ly93d3cubW92aWVzdGFycGxhbmV0LmNvbTo0NDM.&hl=fr&v=vP4jQKq0YJFzU6e21-BGy3GP&size=invisible&cb=oul7f799qkr6"
             response = requests.get(url).text
 
             proto_data = data_pb2.ProtobufData(
-                A="qljbK_DTcvY1PzbR7IG69z1r",
+                    A="qljbK_DTcvY1PzbR7IG69z1r",
                     B=re.search(r'value="([^"]*)"', response).group(1),
                     C="!7Oqg6u8KAAQeF6g9bQEHDwLHaMPdyY7ouljPgQLRkFk2F1_itEwRVMtNNtAClz4c9AJDkWZ0NDXld44MdB1GiLK3E3ykbGIqxFYsRce3-5wFxCJ8MDLUgEO21E4ZdXE05UJAytb9NZWAzdh9D0hVUfS1xCqJ5LGAEuAqvx6GwI76CT8bWF2EAtnEIeuK7YdFYVMCMfkwroua67Hs0vQXjCp3aC9aOL1dsjdH5QG5FjvX7bUyFWxm0du9GvS-O4ZD5ABvfNxd4GW9GfPWlSy2TKIx0eaPPvb4cGxFwHSbDpCvkENiej4PZw8d4oXCitcFzK2QbmbV5WlikvzC2GRRhyIYC2FNm1leYH1ZzwHBRXim1YA0JswO2-lBZ-Hk3Fo-q1LL6ZAIM3FoMwk5ZIUUhhady-Mp4HfP3ZW4vaZELKq6tbH0cNt-LXItIv7obnR5g865bfiI3ghOuJMPlEbdZBt5RG5j1gSoTMaOIgKXDjBrHfLdaK-L9uz6P6RegHy9aaTFWOJF092IwxB_7fdLqQtbOWYCmPrio2TDMGsnz8Q0AuhtZjBrqrHm3sNdXKJHj-ThNAmCdSeZN2dYtIuk9YbnqKdqxq6TQvH5F1yVQ23EKIK-Si27ovMKZd_TRqXYOcg-XtMhxr4VL2QUI55RZcjzs7bhl8NPFneQHffJhn7PPUn36UKEhMIJGHh4YRpVGeT8cRDZSMEbCsoXSQUvH1kOyTjJgnrC9eKYMU018jtMELoU4diIwVkJHKYidbvT134CAPBZM0trcy8KCkOjhJYbl9PQft2ELyoCHJ-YHnKnm_YPfSycArIdWh4q4FVz4IC_EZM-cdGvk4TH92f4iBOUINOioeEP9MS7TjyRT9p6KH0Jotojc2V0N7fmlcthcBqe3F9ll85q-tC4V1R0Ek3-K1quSfodSmbe8bAXdLRMYrGqa1RXh0G0H_aAbXeh7La7wZL1xOUnnAA03e9-8Q2jo_oE0ixGjMFUHqqfBN8qqNeWpOHzUZQJRtP1vb8r9g0F4S6j4MXL5rBnGsPcXQ",
                     D="217035401",
@@ -316,7 +344,14 @@ class MSPClient:
             
             serialized_data = proto_data.SerializeToString()
 
-            headers = {'Content-Type': 'application/x-protobuffer'}
+            headers = {
+                'Content-Type': 'application/x-protobuffer',
+                "x-flash-version": "32,0,0,170",
+                "accept-language": "en-us",
+                "user-agent": "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en) AppleWebKit/533.19.4 (KHTML, like Gecko) AdobeAIR/32.0",
+                'Connection': 'keep-alive'
+
+            }
             upload_url = "https://www.google.com/recaptcha/api2/reload?k=6LcxuOsUAAAAAI2IYDfxOvAZrwRg2T1E7sJq96eg"
             upload_response = requests.post(upload_url, data=serialized_data, headers=headers)
             
@@ -327,9 +362,9 @@ class MSPClient:
         except Exception as e:
             return f"Error: {str(e)}"
 
-    def get_name_suggestion():
+    def get_name_suggestion(self):
         headers = {
-            "content-type": "application/x-amf",
+            "Content-Type": "application/x-amf",
             "x-flash-version": "32,0,0,170",
             "accept-language": "en-us",
             "user-agent": "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en) AppleWebKit/533.19.4 (KHTML, like Gecko) AdobeAIR/32.0",
@@ -338,40 +373,50 @@ class MSPClient:
         url = f"https://us.mspapis.com/profileidentity/v1/profiles/names/suggestions/?&gameId=5ooi&culture=en-US"
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        response.raise_for_status()
         name_suggestion = json.loads(response.text)
         concatenated_name = "".join(name_suggestion)
         return concatenated_name
     
-    def create_checksum(server, password, username):
+    def create_checksum(self, server, password, username):
         secret_key = "7jA7^kAZSHtjxDAa"
         message = f"5ooi{server}{password}{username}false"
         signature = hmac.new(secret_key.encode('utf-8'), message.encode('utf-8'), hashlib.sha256).hexdigest()
         return signature.lower()
 
-    def register_login_profile(server, password, username, checksum, captcha_token):
-        url = f"https://{'us' if server.upper() == 'US' else 'eu'}.mspapis.com/edgelogins/graphql/graphql"
-        headers = {'Content-Type': 'application/json'}
+    def register_login_profile(self, password, username, checksum, captcha_token):
+        url = f"https://us.mspapis.com/edgelogins/graphql/graphql"
+        headers = {
+            'Content-Type': 'application/json',
+            "x-flash-version": "32,0,0,170",
+            "accept-language": "en-us",
+            "user-agent": "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en) AppleWebKit/533.19.4 (KHTML, like Gecko) AdobeAIR/32.0",
+            'Connection': 'keep-alive'
+        }
         payload = {
-            "query": """mutation create ($loginName: String!, $password: String!, $gameId: String!, $isGuest: Boolean!, $countryCode: Region!, $checksum: String!, $recaptchaV3Token: String ){
-                        createLoginProfile(input: { name: $loginName, password: $password, gameId: $gameId, region: $countryCode, isGuest: $isGuest }, 
-                        verify: {checksum: $checksum, recaptchaV3Token: $recaptchaV3Token } ) {
-                        success,loginProfile {loginId,loginName,profileId,profileName,isGuest},error}}""",
-            "variables": {
+            "query": "mutation create ($loginName: String!, $password: String!, $gameId: String!, $isGuest: Boolean!, $countryCode: Region!, $checksum: String!, $recaptchaV3Token: String ){createLoginProfile(input: { name: $loginName, password: $password, gameId: $gameId, region: $countryCode, isGuest: $isGuest }, verify: {checksum: $checksum, recaptchaV3Token: $recaptchaV3Token } ) {success,loginProfile {loginId,loginName,profileId,profileName,isGuest},error}}",
+            "variables": json.dumps({
                 "checksum": checksum,
                 "loginName": username,
                 "password": password,
                 "gameId": "5ooi",
                 "isGuest": False,
-                "countryCode": server.upper(),
+                "countryCode": self.server.upper(),
                 "recaptchaV3Token": captcha_token
-            },
+            }),
             "operationName": ""
         }
         response = requests.post(url, headers=headers, json=payload)
-        response.raise_for_status()
-        return response.json()
+        # response_json = response.json()
+        return response
     
     def bot_generator(self):
-        
+        captcha_token = self.captcha_v3()
+        server = self.server
+        username = self.get_name_suggestion()
+        password = "test123"
+        checksum = self.create_checksum(server, password, username)
+        login_response = self.register_login_profile(password, username, checksum, captcha_token)
+        # login_success = login_response['data']['createLoginProfile']['success']
 
+        return login_response.text
+        # return (f"Username: {username}, password: {password}, Login_Response: {login_response}, Login_Succes: {login_success}")

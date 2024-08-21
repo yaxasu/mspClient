@@ -17,7 +17,7 @@ def send_autograph_for_account(server, username, password, target_user):
 
 def give_autographs():
     server = "us"
-    target_user = "// Kaylyn //"
+    target_user = "<joel2>"
 
     with open("bots.txt", "r") as bots_file:
         accounts = [line.strip().split(":") for line in bots_file]
@@ -44,7 +44,7 @@ def watch_movie_for_account(server, username, password, movie_id):
 
 def watch_movie():
     server = "us"
-    movie_id = 33087247
+    movie_id = 33087309
 
     with open("bots.txt", "r") as bots_file:
         accounts = [line.strip().split(":") for line in bots_file]
@@ -54,7 +54,7 @@ def watch_movie():
         futures = []
         for username, password in accounts:
             futures.append(executor.submit(watch_movie_for_account, server, username, password, movie_id))
-            time.sleep(random.uniform(4, 6))
+            time.sleep(random.uniform(6, 7))
         for future in futures:
             future.result()
 
