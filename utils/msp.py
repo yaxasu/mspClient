@@ -35,7 +35,7 @@ def calculate_checksum(arguments):
     Calculate the checksum for the given arguments.
     """
     no_ticket_value = "XSV7%!5!AX2L8@vn"
-    salt = "2zKzokBI4^26#oiP"
+    salt = "2zKzokBI4^26#oi"
 
     def from_array(arguments):
         return ''.join(from_object_inner(i) for i in arguments)
