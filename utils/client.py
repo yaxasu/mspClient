@@ -7,10 +7,9 @@
 import json
 import websocket
 import requests
-from msp import invoke_method, get_session_id, ticket_header, calculate_checksum
-from datetime import datetime
+from utils.msp import invoke_method, get_session_id, ticket_header, calculate_checksum
 import requests
-import data_pb2
+import utils.data_pb2
 from google.protobuf.json_format import MessageToJson
 import re
 import hashlib
@@ -241,11 +240,12 @@ class MSPClient:
             print(resp)
 
     def validate_bot(self):
-        self.claim_daily_award("wheel", 120, 4)
-        self.claim_daily_award("starwheel", 120, 4)
-        self.claim_daily_award("starVipWheel", 200, 4)
-        self.claim_daily_award("advertWheelDwl", 240, 2)
-        self.claim_daily_award("advertWheelVipDwl", 400, 2)
+        self.claim_daily_award("wheel", 120, 1)
+        # self.claim_daily_award("wheel", 120, 4)
+        # self.claim_daily_award("starwheel", 120, 4)
+        # self.claim_daily_award("starVipWheel", 200, 4)
+        # self.claim_daily_award("advertWheelDwl", 240, 2)
+        # self.claim_daily_award("advertWheelVipDwl", 400, 2)
 
     def lisa_coins(self):
         code, resp = invoke_method(
@@ -434,6 +434,7 @@ class MSPClient:
         username = self.get_name_suggestion()
         password = "test123"
         checksum = self.create_checksum(password, username)
+        print(username)
         login_response = self.register_login_profile(password, username, checksum, captcha_token)
 
         return login_response.text

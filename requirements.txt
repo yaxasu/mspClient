@@ -1,8 +1,12 @@
 certifi==2024.7.4
+cffi==1.17.0
 charset-normalizer==3.3.2
+curl_cffi==0.7.1
 defusedxml==0.7.1
 idna==3.7
+protobuf==5.27.3
 Py3AMF==0.8.10
+pycparser==2.22
 requests==2.32.3
 urllib3==2.2.2
 websocket-client==1.8.0

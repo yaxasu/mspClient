@@ -1,4 +1,4 @@
-from client import MSPClient
+from utils.client import MSPClient
 import time
 from concurrent.futures import ThreadPoolExecutor
 
@@ -39,12 +39,11 @@ def pixeler():
     for client in clients:
         client.close_connection()
 
-def watch_movie():
+def watch_movie(movie_id):
     """
     Function to automate the process of watching a specific movie using multiple accounts.
     """
     server = "us"
-    movie_id = 33087419
 
     with open("bots.txt", "r") as bots_file:
         accounts = [line.strip().split(":") for line in bots_file]
@@ -61,15 +60,15 @@ def watch_movie():
         print(f"Watched Movie: {res}")
         client.close_connection()
 
-        if input("Press 'q' to quit, any other key to continue: ") == "q":
+        x = input("Press 'q' to quit, any other key to continue: ")
+        if x == "q":
             break
 
-def give_autographs():
+def give_autographs(target_user):
     """
     Function to send autographs from multiple accounts to a specified user.
     """
     server = "us"
-    target_user = "simplyjas"
 
     with open("bots.txt", "r") as bots_file:
         accounts = [line.strip().split(":") for line in bots_file]
@@ -125,9 +124,8 @@ def send_autograph_for_account(server, username, password, target_user):
 
     client.close_connection()
 
-def give_threaded_autographs():
+def give_threaded_autographs(target_user):
     server = "us"
-    target_user = "<joel2>"
 
     with open("bots.txt", "r") as bots_file:
         accounts = [line.strip().split(":") for line in bots_file]
@@ -167,8 +165,5 @@ def watch_threaded_movie():
             time.sleep(random.uniform(6, 7))
         for future in futures:
             future.result()
-
-
-
 
 pixeler()
